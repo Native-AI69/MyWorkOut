@@ -8,17 +8,90 @@ import plotly.express as px
 
 PROGRAM_PATH = "program.csv"
 LOG_PATH = "workouts_log.csv"
+CONTACT_EMAIL = "MiguelSilvabb1@gmail.com"
+
+# ----------------- Access Control -----------------
+def get_app_password() -> str:
+    """
+    Preferred: Streamlit Cloud -> App -> Settings -> Secrets:
+      APP_PASSWORD = "yourStrongPassword"
+    Fallback: environment variable APP_PASSWORD
+    Final fallback: "changeme" (NOT recommended)
+    """
+    try:
+        pw = st.secrets.get("APP_PASSWORD", "")
+        if pw:
+            return str(pw)
+    except Exception:
+        pass
+
+    pw = os.getenv("APP_PASSWORD", "")
+    if pw:
+        return pw
+
+    return "changeme"
+
+def access_gate() -> bool:
+    """
+    Returns True only after:
+      1) user acknowledges disclaimer, and
+      2) user enters correct password.
+    """
+    if "acknowledged" not in st.session_state:
+        st.session_state.acknowledged = False
+    if "authed" not in st.session_state:
+        st.session_state.authed = False
+
+    st.markdown("## ⚠️ Important Notice, Authorized Use Only")
+    with st.expander("CONFIDENTIAL - LIMITED ACCESS", expanded=True):
+        st.markdown(
+            """
+**This application and its contents are proprietary and confidential. By accessing this application, you acknowledge that:**
+
+- You are **not** a competitor or engaged in model replication
+- You will **not share** access credentials or URLs
+- Data, visuals, and methodologies are **not for redistribution**
+
+Access events may be logged for audit and security purposes.
+"""
+        )
+
+        acknowledged = st.checkbox("I acknowledge and agree", value=st.session_state.acknowledged)
+        st.button("Continue", disabled=not acknowledged)
+
+        if acknowledged != st.session_state.acknowledged:
+            st.session_state.acknowledged = acknowledged
+
+    if not st.session_state.acknowledged:
+        st.info("Please check the box above to acknowledge and proceed.")
+        return False
+
+    # Password step
+    st.markdown("## 🔒 Enter Access Password")
+    st.caption("Please enter your authorized access password to continue.")
+
+    pw_input = st.text_input("Password", type="password", placeholder="Enter password...")
+    enter = st.button("Enter Application")
+
+    st.markdown(f"Need access? Contact: **{CONTACT_EMAIL}**")
+
+    app_pw = get_app_password()
+    if app_pw == "changeme":
+        st.warning("APP_PASSWORD is not set in Streamlit Secrets. Set it to protect access. Using default password is not recommended.")
+
+    if enter:
+        if pw_input == app_pw:
+            st.session_state.authed = True
+            st.success("Access granted.")
+        else:
+            st.session_state.authed = False
+            st.error("Incorrect password.")
+
+    return bool(st.session_state.authed)
 
 # ----------------- Program -----------------
 @st.cache_data
 def load_program() -> pd.DataFrame:
-    """
-    Loads program.csv robustly.
-
-    Common cause of ParserError: a comma inside a field that is not quoted.
-    This loader uses the python engine (more tolerant) and shows a helpful
-    message if parsing fails.
-    """
     try:
         df = pd.read_csv(
             PROGRAM_PATH,
@@ -27,8 +100,7 @@ def load_program() -> pd.DataFrame:
             quotechar='"',
             encoding="utf-8-sig",
         )
-    except Exception as e:
-        # Show the first ~50 lines of the file to diagnose formatting.
+    except Exception:
         preview = ""
         try:
             with open(PROGRAM_PATH, "r", encoding="utf-8-sig", errors="replace") as f:
@@ -50,7 +122,6 @@ def load_program() -> pd.DataFrame:
         st.dataframe(df.head(20), use_container_width=True)
         st.stop()
 
-    # Normalize types
     df["sets_prescribed"] = pd.to_numeric(df["sets_prescribed"], errors="coerce").fillna(0).astype(int)
     df["day"] = df["day"].astype(str).str.strip()
     return df
@@ -113,7 +184,6 @@ def compliance_check(
 ) -> tuple[str, list[str]]:
     reasons: list[str] = []
 
-    # Hard stops
     if pain in ["Moderate", "Severe"]:
         return "FAIL", ["Pain is Moderate/Severe"]
     if equipment.lower() == "barbell" and not barbell_same_weight:
@@ -121,7 +191,6 @@ def compliance_check(
     if str(set_quality).startswith("Red"):
         return "FAIL", ["Set quality marked Red"]
 
-    # Warnings
     if form == "Bad":
         reasons.append("Form marked Bad")
     if str(set_quality).startswith("Yellow"):
@@ -135,9 +204,13 @@ def compliance_check(
         return "WARN", reasons
     return "PASS", reasons
 
-# ----------------- UI -----------------
+# ----------------- Main App -----------------
 def main():
     st.set_page_config(page_title="Strength Program Tracker", layout="wide")
+
+    if not access_gate():
+        st.stop()
+
     program = load_program()
     ensure_log_exists()
 
