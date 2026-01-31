@@ -12,14 +12,47 @@ LOG_PATH = "workouts_log.csv"
 # ----------------- Program -----------------
 @st.cache_data
 def load_program() -> pd.DataFrame:
-    df = pd.read_csv(PROGRAM_PATH)
+    """
+    Loads program.csv robustly.
+
+    Common cause of ParserError: a comma inside a field that is not quoted.
+    This loader uses the python engine (more tolerant) and shows a helpful
+    message if parsing fails.
+    """
+    try:
+        df = pd.read_csv(
+            PROGRAM_PATH,
+            engine="python",
+            sep=",",
+            quotechar='"',
+            encoding="utf-8-sig",
+        )
+    except Exception as e:
+        # Show the first ~50 lines of the file to diagnose formatting.
+        preview = ""
+        try:
+            with open(PROGRAM_PATH, "r", encoding="utf-8-sig", errors="replace") as f:
+                preview = "".join([next(f) for _ in range(50)])
+        except Exception:
+            preview = "(Could not read program.csv preview.)"
+
+        st.error("Could not parse program.csv. This is usually caused by an extra comma in a field that isn't quoted.")
+        st.code(preview, language="text")
+        st.stop()
+
     required = {
         "day","group","exercise_id","exercise_name","equipment",
         "sets_prescribed","reps_prescribed","load_target","load_unit"
     }
     missing = required - set(df.columns)
     if missing:
-        raise ValueError(f"{PROGRAM_PATH} missing columns: {sorted(missing)}")
+        st.error(f"program.csv is missing required columns: {sorted(missing)}")
+        st.dataframe(df.head(20), use_container_width=True)
+        st.stop()
+
+    # Normalize types
+    df["sets_prescribed"] = pd.to_numeric(df["sets_prescribed"], errors="coerce").fillna(0).astype(int)
+    df["day"] = df["day"].astype(str).str.strip()
     return df
 
 # ----------------- Log (CSV) -----------------
@@ -55,7 +88,7 @@ def reps_meet_prescription(sets_prescribed: int, reps_prescribed: str, reps_by_s
 
         reps_prescribed = str(reps_prescribed).strip()
         if "-" in reps_prescribed:
-            lo, hi = reps_prescribed.split("-")
+            lo, _hi = reps_prescribed.split("-")
             lo = int(lo.strip())
             if any(r < lo for r in reps_list):
                 return False, "Some sets below minimum rep target"
@@ -113,7 +146,6 @@ def main():
 
     tab1, tab2 = st.tabs(["Log Workout", "Dashboard"])
 
-    # ----- Log -----
     with tab1:
         st.subheader("Log a workout")
 
@@ -245,7 +277,6 @@ def main():
 
         st.divider()
         st.markdown("### Download your log")
-        st.caption("If you host on Streamlit Cloud, downloading the CSV is the simplest way to keep a copy.")
         log_df = read_log()
         st.download_button(
             label="Download workouts_log.csv",
@@ -254,7 +285,6 @@ def main():
             mime="text/csv"
         )
 
-    # ----- Dashboard -----
     with tab2:
         st.subheader("Dashboard")
         log = read_log()

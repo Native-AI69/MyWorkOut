@@ -1,27 +1,27 @@
-day,group,exercise_id,exercise_name,equipment,sets_prescribed,reps_prescribed,load_target,load_unit
-Mon,Chest & Triceps,MON_BP,Barbell Bench Press,barbell,5,5,110,plates only
-Mon,Chest & Triceps,MON_IBP,Incline Barbell Bench Press,barbell,4,5,90,plates only
-Mon,Chest & Triceps,MON_FLY,Seated Symmetrical Chest Fly Machine,machine,3,10-12,controlled,lb
-Mon,Chest & Triceps,MON_TPD,Cable Triceps Pushdown,cable,3,8,controlled,lb
-Mon,Chest & Triceps,MON_OHE,Overhead Cable Triceps Extension,cable,3,8,controlled,lb
-Mon,Chest & Triceps,MON_KICK,Bent-Over Dumbbell Triceps Kickback,dumbbell,2,12,controlled,lbs each
-Tue,Back & Biceps,TUE_LPD_BHN,Wide-Grip Lat Pulldown Behind the Neck,machine,4,6,140,lb
-Tue,Back & Biceps,TUE_LPD_NG,Neutral-Grip Lat Pulldown to Chest (Short Bar),machine,4,5,160,lb
-Tue,Back & Biceps,TUE_ROW,Seated Cable Row (legs straight),cable,3,6,140,lb
-Tue,Back & Biceps,TUE_REV,Barbell Reverse Curl,barbell,3,6,50,plates only
-Tue,Back & Biceps,TUE_CURL,Barbell Biceps Curl,barbell,4,5,70,plates only
-Tue,Back & Biceps,TUE_INCL,Incline Dumbbell Curl (45-degree bench),dumbbell,3,8,30,lbs each
-Tue,Back & Biceps,TUE_BCM,Biceps Curl Machine,machine,2,10,70,lb
-Thu,Legs,THU_LUNGE,Single-Leg Long-Step Lunge (holding weight),dumbbell,3,6,45,lb
-Thu,Legs,THU_HT,Barbell Hip Thrust,barbell,4,5,180,plates only
-Thu,Legs,THU_LP,Leg Press Machine,machine,3,8,90,lb
-Thu,Legs,THU_KB,Leg Kickback (upward extension),machine,3,10,60,lb
-Thu,Legs,THU_EXT,Seated Leg Extension (two legs),machine,3,10,50,lb
-Thu,Legs,THU_CALF,Seated Calf Raise (weight on knees),machine,4,10,90,lb
-Fri,Shoulders,FRI_LAT,Standing Dumbbell Lateral Raise,dumbbell,3,12,15,lbs each
-Fri,Shoulders,FRI_BNP,Behind-the-Neck Barbell Overhead Press,barbell,4,5,60,plates only
-Fri,Shoulders,FRI_PU,Barbell Push-Up (hands on bar, plates loaded),barbell,3,8,50,plates only
-Fri,Shoulders,FRI_ROW,Standing Barbell Row,barbell,3,6,70,plates only
-Fri,Shoulders,FRI_SHRUG,Standing Barbell Shrug,barbell,3,8,180,plates only
-Fri,Shoulders,FRI_FP,High Cable Face Pull (from above, angled to face),cable,3,12,50,lb
-Fri,Shoulders,FRI_RPD,Seated Reverse Pec Deck Fly,machine,3,12,135,lb
+"day","group","exercise_id","exercise_name","equipment","sets_prescribed","reps_prescribed","load_target","load_unit"
+"Mon","Chest & Triceps","MON_BP","Barbell Bench Press","barbell","5","5","110","plates only"
+"Mon","Chest & Triceps","MON_IBP","Incline Barbell Bench Press","barbell","4","5","90","plates only"
+"Mon","Chest & Triceps","MON_FLY","Seated Symmetrical Chest Fly Machine","machine","3","10-12","controlled","lb"
+"Mon","Chest & Triceps","MON_TPD","Cable Triceps Pushdown","cable","3","8","controlled","lb"
+"Mon","Chest & Triceps","MON_OHE","Overhead Cable Triceps Extension","cable","3","8","controlled","lb"
+"Mon","Chest & Triceps","MON_KICK","Bent-Over Dumbbell Triceps Kickback","dumbbell","2","12","controlled","lbs each"
+"Tue","Back & Biceps","TUE_LPD_BHN","Wide-Grip Lat Pulldown Behind the Neck","machine","4","6","140","lb"
+"Tue","Back & Biceps","TUE_LPD_NG","Neutral-Grip Lat Pulldown to Chest (Short Bar)","machine","4","5","160","lb"
+"Tue","Back & Biceps","TUE_ROW","Seated Cable Row (legs straight)","cable","3","6","140","lb"
+"Tue","Back & Biceps","TUE_REV","Barbell Reverse Curl","barbell","3","6","50","plates only"
+"Tue","Back & Biceps","TUE_CURL","Barbell Biceps Curl","barbell","4","5","70","plates only"
+"Tue","Back & Biceps","TUE_INCL","Incline Dumbbell Curl (45-degree bench)","dumbbell","3","8","30","lbs each"
+"Tue","Back & Biceps","TUE_BCM","Biceps Curl Machine","machine","2","10","70","lb"
+"Thu","Legs","THU_LUNGE","Single-Leg Long-Step Lunge (holding weight)","dumbbell","3","6","45","lb"
+"Thu","Legs","THU_HT","Barbell Hip Thrust","barbell","4","5","180","plates only"
+"Thu","Legs","THU_LP","Leg Press Machine","machine","3","8","90","lb"
+"Thu","Legs","THU_KB","Leg Kickback (upward extension)","machine","3","10","60","lb"
+"Thu","Legs","THU_EXT","Seated Leg Extension (two legs)","machine","3","10","50","lb"
+"Thu","Legs","THU_CALF","Seated Calf Raise (weight on knees)","machine","4","10","90","lb"
+"Fri","Shoulders","FRI_LAT","Standing Dumbbell Lateral Raise","dumbbell","3","12","15","lbs each"
+"Fri","Shoulders","FRI_BNP","Behind-the-Neck Barbell Overhead Press","barbell","4","5","60","plates only"
+"Fri","Shoulders","FRI_PU","Barbell Push-Up (hands on bar, plates loaded)","barbell","3","8","50","plates only"
+"Fri","Shoulders","FRI_ROW","Standing Barbell Row","barbell","3","6","70","plates only"
+"Fri","Shoulders","FRI_SHRUG","Standing Barbell Shrug","barbell","3","8","180","plates only"
+"Fri","Shoulders","FRI_FP","High Cable Face Pull (from above, angled to face)","cable","3","12","50","lb"
+"Fri","Shoulders","FRI_RPD","Seated Reverse Pec Deck Fly","machine","3","12","135","lb"
