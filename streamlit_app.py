@@ -13,7 +13,7 @@ CONTACT_EMAIL = "MiguelSilvabb1@gmail.com"
 # ----------------- Access Control -----------------
 def get_app_password() -> str:
     """
-    Preferred: Streamlit Cloud -> App -> Settings -> Secrets:
+    Streamlit Cloud -> App -> Settings -> Secrets:
       APP_PASSWORD = "yourStrongPassword"
     Fallback: environment variable APP_PASSWORD
     Final fallback: "changeme" (NOT recommended)
@@ -31,21 +31,34 @@ def get_app_password() -> str:
 
     return "changeme"
 
-def access_gate() -> bool:
-    """
-    Returns True only after:
-      1) user acknowledges disclaimer, and
-      2) user enters correct password.
-    """
-    if "acknowledged" not in st.session_state:
-        st.session_state.acknowledged = False
+def init_access_state() -> None:
+    if "access_stage" not in st.session_state:
+        st.session_state.access_stage = "disclaimer"  # disclaimer -> password -> app
     if "authed" not in st.session_state:
         st.session_state.authed = False
+    if "acknowledged" not in st.session_state:
+        st.session_state.acknowledged = False
 
-    st.markdown("## ⚠️ Important Notice, Authorized Use Only")
-    with st.expander("CONFIDENTIAL - LIMITED ACCESS", expanded=True):
-        st.markdown(
-            """
+def access_gate() -> bool:
+    """
+    Desired flow:
+      1) Show disclaimer screen only.
+      2) After Continue, disclaimer disappears and password screen shows.
+      3) After correct password, password screen disappears and app loads.
+    """
+    init_access_state()
+
+    if st.session_state.authed:
+        st.session_state.access_stage = "app"
+        return True
+
+    # ----- Stage 1: Disclaimer -----
+    if st.session_state.access_stage == "disclaimer":
+        st.markdown("## ⚠️ Important Notice, Authorized Use Only")
+
+        with st.expander("CONFIDENTIAL - LIMITED ACCESS", expanded=True):
+            st.markdown(
+                """
 **This application and its contents are proprietary and confidential. By accessing this application, you acknowledge that:**
 
 - You are **not** a competitor or engaged in model replication
@@ -54,40 +67,53 @@ def access_gate() -> bool:
 
 Access events may be logged for audit and security purposes.
 """
-        )
+            )
 
-        acknowledged = st.checkbox("I acknowledge and agree", value=st.session_state.acknowledged)
-        st.button("Continue", disabled=not acknowledged)
-
-        if acknowledged != st.session_state.acknowledged:
+            acknowledged = st.checkbox("I acknowledge and agree", value=st.session_state.acknowledged)
             st.session_state.acknowledged = acknowledged
 
-    if not st.session_state.acknowledged:
+            continue_clicked = st.button("Continue", disabled=not acknowledged)
+
+        if continue_clicked and st.session_state.acknowledged:
+            st.session_state.access_stage = "password"
+            st.rerun()
+
         st.info("Please check the box above to acknowledge and proceed.")
         return False
 
-    # Password step
-    st.markdown("## 🔒 Enter Access Password")
-    st.caption("Please enter your authorized access password to continue.")
+    # ----- Stage 2: Password -----
+    if st.session_state.access_stage == "password":
+        st.markdown("## 🔒 Enter Access Password")
+        st.caption("Please enter your authorized access password to continue.")
 
-    pw_input = st.text_input("Password", type="password", placeholder="Enter password...")
-    enter = st.button("Enter Application")
+        pw_input = st.text_input("Password", type="password", placeholder="Enter password...")
 
-    st.markdown(f"Need access? Contact: **{CONTACT_EMAIL}**")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            back = st.button("Back")
+        with col2:
+            enter = st.button("Enter Application")
 
-    app_pw = get_app_password()
-    if app_pw == "changeme":
-        st.warning("APP_PASSWORD is not set in Streamlit Secrets. Set it to protect access. Using default password is not recommended.")
+        if back:
+            st.session_state.access_stage = "disclaimer"
+            st.rerun()
 
-    if enter:
-        if pw_input == app_pw:
-            st.session_state.authed = True
-            st.success("Access granted.")
-        else:
-            st.session_state.authed = False
-            st.error("Incorrect password.")
+        st.markdown("Need access? Contact: **" + CONTACT_EMAIL + "**")
 
-    return bool(st.session_state.authed)
+        app_pw = get_app_password()
+        if app_pw == "changeme":
+            st.warning("APP_PASSWORD is not set in Streamlit Secrets. Set it to protect access. Using the default password is not recommended.")
+
+        if enter:
+            if pw_input == app_pw:
+                st.session_state.authed = True
+                st.session_state.access_stage = "app"
+                st.rerun()
+            else:
+                st.error("Incorrect password.")
+        return False
+
+    return False
 
 # ----------------- Program -----------------
 @st.cache_data
